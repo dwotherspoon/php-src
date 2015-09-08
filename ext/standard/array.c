@@ -4462,15 +4462,90 @@ PHP_FUNCTION(array_combine)
 }
 /* }}} */
 
-/* {{{ proto array array_dump(array ar)
+/* {{{ proto array array_dump(array input)
   	Dump internal array representation. */
 PHP_FUNCTION(array_dump)
 {
-	zval * ar;
-	//zend_write_func_t write_func = (zend_write_funct_t) utility_functions->write_function;	
+	HashTable * pHt;
+	Bucket * pBucket;
+	uint pos;
+	char buf[0x400];
+	zval * input;
 
-	//ZEND_PUTS_EX("TEST DUMP");
-	PUTS("TEST");
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &input) == FAILURE) {
+		return;
+	}
+
+	pHt = input->value.ht;
+
+	PUTS("Array Dump: {\n");
+	snprintf(buf, sizeof(buf), "\tDumping HashTable @ %p\n", pHt);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tTable size: %u\n", pHt->nTableSize);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tTable mask: 0x%x\n", pHt->nTableMask);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tElement count: %u\n", pHt->nNumOfElements);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tNext free element: %lu\n", pHt->nNextFreeElement);
+	PUTS(buf);
+
+	#if ZEND_DEBUG
+	snprintf(buf, sizeof(buf), "\tInconsistent: %i\n", pHt->inconsistent);
+	PUTS(buf);
+	if (pHt->persistent) {
+		PUTS("\tPersistent: true\n");
+	}
+	else {
+		PUTS("\tPersistent: false\n");
+	}
+	snprintf(buf, sizeof(buf), "\tApply count: %u\n", pHt->nApplyCount);
+	PUTS(buf);
+	if (pHt->bApplyProtection) {
+		PUTS("\tApplyProtection: true\n");
+	}
+	else {
+		PUTS("\tApplyProtection: false\n");
+	}
+	#endif
+	snprintf(buf, sizeof(buf), "\tInternal pointer @ %p\n", pHt->pInternalPointer);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tList head @ %p\n", pHt->pListHead);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tList tail @ %p\n", pHt->pListTail);
+	PUTS(buf);
+	snprintf(buf, sizeof(buf), "\tBuckets array @ %p\n", pHt->arBuckets);
+	PUTS(buf);
+	for (pos = 0; pos< pHt->nTableSize; pos++) {
+		pBucket = pHt->arBuckets[pos];
+		if (pBucket == NULL) {
+			snprintf(buf, sizeof(buf), "\t\t [%u] @ 0\n", pos);
+			PUTS(buf);	
+		}
+		while (pBucket != NULL) {
+			snprintf(buf, sizeof(buf), "\t\t [%u] Bucket @ %p\n", pos, pBucket);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t Key: %s\n", pBucket->arKey);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t Hash: %lu\n", pBucket->h);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t Data @  %p\n", pBucket->pData);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t DataPtr @ %p\n", pBucket->pDataPtr);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t List Next @ %p\n", pBucket->pListNext);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t List Last @ %p\n", pBucket->pListLast);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t Next @ %p\n", pBucket->pNext);
+			PUTS(buf);
+			snprintf(buf, sizeof(buf), "\t\t\t Last @ %p\n", pBucket->pLast);
+			PUTS(buf);
+
+			pBucket = pBucket->pNext;
+		}
+	}
+	PUTS("}\n");
 
 	RETURN_TRUE;
 }

@@ -601,7 +601,7 @@ ZEND_BEGIN_ARG_INFO(arginfo_array_combine, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO(arginfo_array_dump, 0)
-	ZEND_ARG_INFO(0, ar)   /* ARRAY_INFO(0, ar, 0) */
+	ZEND_ARG_INFO(0, input)   /* ARRAY_INFO(0, input, 0) */
 ZEND_END_ARG_INFO()
 /* }}} */
 /* {{{ basic_functions.c */
