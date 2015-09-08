@@ -25,6 +25,7 @@
 
 #include "php.h"
 #include "php_ini.h"
+#include "zend.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <math.h>
@@ -4458,6 +4459,20 @@ PHP_FUNCTION(array_combine)
 		zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos_keys);
 		zend_hash_move_forward_ex(Z_ARRVAL_P(values), &pos_values);
 	}
+}
+/* }}} */
+
+/* {{{ proto array array_dump(array ar)
+  	Dump internal array representation. */
+PHP_FUNCTION(array_dump)
+{
+	zval * ar;
+	//zend_write_func_t write_func = (zend_write_funct_t) utility_functions->write_function;	
+
+	//ZEND_PUTS_EX("TEST DUMP");
+	PUTS("TEST");
+
+	RETURN_TRUE;
 }
 /* }}} */
 
